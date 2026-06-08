@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0f1117">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TN Court VC">
+<meta name="description" content="Find hybrid video conferencing links for all 38 Tamil Nadu district courts instantly. Search by district, taluk or place name.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>TN Court Hybrid VC Links</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f1117;--surface:#161922;--card:#1e2235;--card2:#242840;
+    --border:#2c3154;--accent:#f59e0b;--blue:#3b82f6;--purple:#a855f7;
+    --text:#eef0ff;--text2:#7b82a8;--text3:#4a5072;--green:#22c55e;--r:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+  header{background:linear-gradient(160deg,#1a1e35,#0f1117);border-bottom:1px solid var(--border);padding:14px 16px 12px;position:sticky;top:0;z-index:100}
+  .htop{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+  .logo{width:40px;height:40px;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 16px rgba(245,158,11,.25)}
+  .ht h1{font-size:15px;font-weight:700;line-height:1.2}
+  .ht p{font-size:11px;color:var(--text2);margin-top:2px}
+  .sw{position:relative}
+  .si{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+  .xb{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--border);border:none;color:var(--text2);width:20px;height:20px;border-radius:50%;font-size:11px;cursor:pointer;display:none;align-items:center;justify-content:center}
+  .xb.on{display:flex}
+  #srch{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:10px 36px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+  #srch:focus{border-color:var(--blue)}
+  #srch::placeholder{color:var(--text3)}
+
+  .ftrow{display:flex;gap:6px;padding:10px 16px 6px;overflow-x:auto;scrollbar-width:none;background:var(--surface);border-bottom:1px solid var(--border)}
+  .ftrow::-webkit-scrollbar{display:none}
+  .ft{flex-shrink:0;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--text2);transition:all .18s;white-space:nowrap}
+  .ft.fa{background:rgba(59,130,246,.15);border-color:var(--blue);color:var(--blue)}
+  .ft.fp{background:rgba(245,158,11,.15);border-color:var(--accent);color:var(--accent)}
+  .ft.fm{background:rgba(168,85,247,.15);border-color:var(--purple);color:var(--purple)}
+
+  .rlabel{padding:10px 16px 4px;font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.07em;text-transform:uppercase}
+  .rlabel span{color:var(--blue);font-weight:700}
+
+  #dlist{padding:6px 12px 100px;display:flex;flex-direction:column;gap:7px}
+
+  .dc{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .2s;animation:fu .2s ease both}
+  .dc.open{border-color:var(--blue)}
+  .dh{display:flex;align-items:center;padding:14px 14px;cursor:pointer;gap:11px;user-select:none;transition:background .15s}
+  .dh:active{background:var(--card2)}
+  .dn{font-size:10px;color:var(--text3);font-weight:700;width:20px;flex-shrink:0;letter-spacing:.04em}
+  .di{flex:1;min-width:0}
+  .dname{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .dsub{font-size:11px;color:var(--text3);margin-top:3px}
+  .bb{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase;flex-shrink:0}
+  .bp{background:rgba(245,158,11,.12);color:var(--accent);border:1px solid rgba(245,158,11,.25)}
+  .bm{background:rgba(168,85,247,.12);color:var(--purple);border:1px solid rgba(168,85,247,.25)}
+  .chev{color:var(--text3);transition:transform .25s;flex-shrink:0}
+  .dc.open .chev{transform:rotate(180deg);color:var(--blue)}
+
+  /* search keyword highlight in district name */
+  .hl{background:rgba(245,158,11,.2);color:var(--accent);border-radius:3px;padding:0 2px}
+
+  .cp{border-top:1px solid var(--border);padding:14px;display:none;flex-direction:column;gap:10px}
+  .dc.open .cp{display:flex}
+
+  /* keyword chips shown when matched via alias */
+  .kw-match{font-size:11px;color:var(--blue);background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:6px 10px}
+  .kw-match strong{color:var(--text)}
+
+  /* open button */
+  .obtn{display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#2563eb,#4f46e5);color:#fff;border:none;border-radius:10px;padding:14px 16px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;text-decoration:none;width:100%;transition:opacity .18s,transform .1s;box-shadow:0 4px 16px rgba(37,99,235,.3)}
+  .obtn:active{opacity:.85;transform:scale(.98)}
+
+  /* known courts row — alias tags */
+  .known-wrap{margin-top:2px}
+  .known-title{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+  .known-chips{display:flex;flex-wrap:wrap;gap:5px}
+  .kchip{font-size:11px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:3px 9px;color:var(--text2);font-weight:500}
+  .kchip.hl{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.35);color:var(--accent)}
+
+  .inote{font-size:11px;color:var(--text3);text-align:center;line-height:1.6}
+  .inote strong{color:var(--text2)}
+
+
+  .empty{text-align:center;padding:60px 20px;color:var(--text3)}
+  .empty .ico{font-size:42px;margin-bottom:12px}
+  .empty p{font-size:14px;line-height:1.6}
+
+  .bbar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 20px;text-align:center;font-size:11px;color:var(--text3);display:flex;align-items:center;justify-content:center;gap:5px}
+  .bbar span{color:var(--accent);font-weight:700}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  @keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="htop">
+    <div class="logo">⚖️</div>
+    <div class="ht">
+      <h1>TN Court Hybrid VC Links</h1>
+      <p>Madras High Court — All 38 Districts</p>
+    </div>
+  </div>
+  <div class="sw">
+    <svg class="si" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input id="srch" type="search" placeholder="Search district, taluk, or court name…" autocomplete="off" spellcheck="false">
+    <button class="xb" id="xb" onclick="clr()">✕</button>
+  </div>
+</header>
+
+<div class="ftrow">
+  <div class="ft fa" data-f="all">All 38 Districts</div>
+  <div class="ft" data-f="p">Principal Bench</div>
+  <div class="ft" data-f="m">Madurai Bench</div>
+</div>
+
+<div class="rlabel" id="rl">ALL DISTRICTS</div>
+<div id="dlist"></div>
+
+<div class="bbar">
+  <div class="dot"></div>
+  Opens live from <span>dcourts.gov.in</span> — always official & up to date
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+// aliases = searchable keywords (taluks / towns / court names) that map to this district
+// Only what is verifiably inside this district's jurisdiction — no guessing.
+// The VC link page is the single source of truth for courts; aliases help search.
+const D = [
+  // ══ PRINCIPAL BENCH ══
+  {id:1, name:"Chennai", bench:"p", slug:"chennai",
+   path:"/hybrid-vc-microsoft-teams-links-for-all-the-courts-functioning-in-chennai-district/",
+   aliases:["egmore","saidapet","mylapore","royapuram","perambur","ambattur","alandur","mambalam","anna nagar","tondiarpet","madhavaram","tiruvottiyur","sholinganallur","pallavaram","city civil","sessions","metropolitan magistrate","family court","small causes","labour court","motor accidents"]},
+
+  {id:2, name:"Kanchipuram", bench:"p", slug:"kanchipuram",
+   path:"/hybrid-vc-links/",
+   aliases:["kanchi","kancheepuram","sriperumbudur","uthiramerur","munsif","sub court","magistrate"]},
+
+  {id:3, name:"Chengalpattu", bench:"p", slug:"chengalpattu",
+   path:"/hybrid-mode-video-conferencing-links-chengalpattu-district-judiciary/",
+   aliases:["tambaram","madurantakam","cheyyur","tiruporur","tirukalukundram","pallavaram","vandalur","chengalpet","munsif","sub court","magistrate","family court"]},
+
+  {id:4, name:"Tiruvallur", bench:"p", slug:"tiruvallur",
+   path:"/hybird-video-conference-link/",
+   aliases:["ambattur","gummidipoondi","ponneri","uthukkottai","tiruvallur","poonamallee","tiruttani","pallipattu","tiruvottiyur","madhavaram","avadi","munsif","sub court","magistrate","family court"]},
+
+  {id:5, name:"Vellore", bench:"p", slug:"vellore",
+   path:"/hybrid-vc/",
+   aliases:["katpadi","gudiyatham","kv kuppam","k.v.kuppam","munsif","sub court","magistrate","labour court","family court"]},
+
+  {id:6, name:"Tiruvannamalai", bench:"p", slug:"tiruvannamalai",
+   path:"/hybridvcmodelink/",
+   aliases:["arni","arani","cheyyar","chengam","kalasapakkam","polur","thandarampattu","vandavasi","kilpennathur","munsif","sub court","magistrate"]},
+
+  {id:7, name:"Villupuram", bench:"p", slug:"viluppuram",
+   path:"/hybrid-vc/",
+   aliases:["tindivanam","gingee","vanur","vikravandi","munsif","sub court","magistrate"]},
+
+  {id:8, name:"Kallakurichi", bench:"p", slug:"kallakurichi",
+   path:"/hybrid-vc-link-kallakurichi-district/",
+   aliases:["sankarapuram","chinnasalem","ulundurpet","thirukovilur","kalvarayan","munsif","sub court","magistrate"]},
+
+  {id:9, name:"Cuddalore", bench:"p", slug:"cuddalore",
+   path:"/hybrid-vc-links-cuddalore/",
+   aliases:["chidambaram","panruti","virudhachalam","kattumannarkoil","kurunjipadi","tittagudi","parangipettai","neyveli","munsif","sub court","magistrate"]},
+
+  {id:10, name:"Krishnagiri", bench:"p", slug:"krishnagiri",
+   path:"/vckrishnagiri/",
+   aliases:["hosur","pochampalli","uthangarai","shoolagiri","denkanikottai","bargur","munsif","sub court","magistrate","fast track"]},
+
+  {id:11, name:"Dharmapuri", bench:"p", slug:"dharmapuri",
+   path:"/hybrid-vc-microsoft-teams-video-conference-link-for-courts-in-dharmapuri-district/",
+   aliases:["harur","palacode","pennagaram","pappireddipatti","morappur","munsif","sub court","magistrate"]},
+
+  {id:12, name:"Salem", bench:"p", slug:"salem",
+   path:"/hybrid-vc-link-for-district-judiciary-salem-district/",
+   aliases:["attur","mettur","omalur","edappadi","sankari","gangavalli","yercaud","munsif","sub court","magistrate","family court","commercial court","fast track"]},
+
+  {id:13, name:"Namakkal", bench:"p", slug:"namakkal",
+   path:"/case-hearing-through-hybrid-mode-video-conference-links-2/",
+   aliases:["rasipuram","tiruchengode","paramathi velur","kumarapalayam","sendamangalam","mohanur","munsif","sub court","magistrate"]},
+
+  {id:14, name:"Erode", bench:"p", slug:"erode",
+   path:"/document/hybrid-vc-link-for-district-judiciary-erode-district/",
+   aliases:["erode","gobichettipalayam","bhavani","sathyamangalam","perundurai","anthiyur","kodumudi","munsif","sub court","magistrate","mahila court","fast track","sessions court"]},
+
+  {id:15, name:"Tiruppur", bench:"p", slug:"tiruppur",
+   path:"/hybrid-video-conferencing-tiruppur-district/",
+   aliases:["avinashi","palladam","dharapuram","kangeyam","udumalpet","gudimangalam","munsif","sub court","magistrate","family court"]},
+
+  {id:16, name:"Coimbatore", bench:"p", slug:"coimbatore",
+   path:"/video-conferencing-links/",
+   aliases:["pollachi","mettupalayam","sulur","annur","valparai","munsif","sub court","magistrate","family court","commercial court","fast track","city civil"]},
+
+  {id:17, name:"The Nilgiris", bench:"p", slug:"nilgiris",
+   path:"/hybrid-vc-link-for-district-judiciary-the-nilgiris-district/",
+   aliases:["udhagamandalam","ooty","coonoor","kotagiri","gudalur","pandalur","district judge","chief judicial magistrate","fast track","family court","labour court","sub court","district munsif","munsif","magistrate","mahila"]},
+
+  {id:18, name:"Tirupattur", bench:"p", slug:"tirupattur",
+   path:"/hybridvc/",
+   aliases:["vaniyambadi","ambur","natrampalli","jolarpettai","munsif","sub court","magistrate"]},
+
+  {id:19, name:"Ranipet", bench:"p", slug:"ranipet",
+   path:"/hybrid-vc-link-of-all-courts-in-ranipet-district/",
+   aliases:["arcot","walajah","walajapet","arakkonam","sholinghur","nemili","munsif","sub court","magistrate","family court"]},
+
+  // ══ MADURAI BENCH ══
+  {id:20, name:"Madurai", bench:"m", slug:"madurai",
+   path:"/hybrid-vc-links-for-courts-in-madurai-district/",
+   aliases:["melur","usilampatti","peraiyur","thirumangalam","sholavandan","munsif","sub court","magistrate","family court","commercial court","fast track"]},
+
+  {id:21, name:"Dindigul", bench:"m", slug:"dindigul",
+   path:"/hybrid-vc-links-for-courts-in-dindigul-district/",
+   aliases:["palani","oddanchatram","natham","vedasandur","nilakkottai","kodaikanal","athoor","munsif","sub court","magistrate","family court"]},
+
+  {id:22, name:"Theni", bench:"m", slug:"theni",
+   path:"/hybrid-mode-video-conference-link-theni/",
+   aliases:["bodinayakkanur","periyakulam","uthamapalayam","andipatti","munsif","sub court","magistrate"]},
+
+  {id:23, name:"Virudhunagar", bench:"m", slug:"virudhunagar",
+   path:"/hybrid-mode-vc-links/",
+   aliases:["sivakasi","aruppukkottai","srivilliputhur","sattur","rajapalayam","tiruchuli","watrap","munsif","sub court","magistrate","family court"]},
+
+  {id:24, name:"Ramanathapuram", bench:"m", slug:"ramanathapuram",
+   path:"/hybrid-vc-links-for-courts-in-ramanathapuram-district-from-05-02-2024/",
+   aliases:["rameswaram","paramakudi","tiruvadanai","mudukulathur","kamudhi","munsif","sub court","magistrate"]},
+
+  {id:25, name:"Sivaganga", bench:"m", slug:"sivagangai",
+   path:"/video-conference-link/",
+   aliases:["karaikudi","devakottai","manamadurai","ilayangudi","tiruppattur","munsif","sub court","magistrate"]},
+
+  {id:26, name:"Tenkasi", bench:"m", slug:"tenkasi",
+   path:"/hybrid-vc-microsoft-teams-video-conference-link-for-courts-in-tenkasi-district/",
+   aliases:["shenkottai","kadayanallur","sankarankoil","alangulam","courtallam","munsif","sub court","magistrate"]},
+
+  {id:27, name:"Tirunelveli", bench:"m", slug:"tirunelveli",
+   path:"/hybrid-video-conference-links-for-courts/",
+   aliases:["ambasamudram","palayamkottai","nanguneri","radhapuram","valliyur","cheranmahadevi","munsif","sub court","magistrate","family court","commercial court","fast track"]},
+
+  {id:28, name:"Thoothukudi", bench:"m", slug:"thoothukudi",
+   path:"/video-conferencing-link-for-all-courts-in-thoothukudi-district/",
+   aliases:["tuticorin","kovilpatti","tiruchendur","srivaikuntam","ettayapuram","kayalpattinam","vilaathikulam","munsif","sub court","magistrate","family court"]},
+
+  {id:29, name:"Kanyakumari", bench:"m", slug:"kanyakumari",
+   path:"/hybrid-vc/",
+   aliases:["nagercoil","padmanabhapuram","colachel","thovalai","agasteeswaram","boothapandi","munsif","sub court","magistrate","family court","sessions court"]},
+
+  {id:30, name:"Thanjavur", bench:"m", slug:"thanjavur",
+   path:"/hybrid-mode-video-conferencing-thanjavur-district/",
+   aliases:["kumbakonam","pattukkottai","papanasam","peravurani","thiruvidaimarudur","orathanadu","munsif","sub court","magistrate","family court"]},
+
+  {id:31, name:"Tiruvarur", bench:"m", slug:"tiruvarur",
+   path:"/tiruvarur-district-hybrid-vc-link/",
+   aliases:["mannargudi","nannilam","needamangalam","thiruthuraipoondi","valangaiman","kottur","kodavasal","munsif","sub court","magistrate"]},
+
+  {id:32, name:"Nagapattinam", bench:"m", slug:"nagapattinam",
+   path:"/vclinks/",
+   aliases:["kilvelur","vedaranyam","kollidam","sirkazhi","munsif","sub court","magistrate"]},
+
+  {id:33, name:"Mayiladuthurai", bench:"m", slug:"mayiladuthurai",
+   path:"/vclink/",
+   aliases:["sirkali","tharangambadi","kuthalam","munsif","sub court","magistrate"]},
+
+  {id:34, name:"Ariyalur", bench:"m", slug:"ariyalur",
+   path:"/hybrid-mode-vc-link-ariyalur-district/",
+   aliases:["ariyalur","jayankondam","sendurai","principal district court","sessions court","additional district court","fast track mahila court","family court","chief judicial magistrate","subordinate court","district munsif","munsif","magistrate","sc st court","laop"]},
+
+  {id:35, name:"Perambalur", bench:"m", slug:"perambalur",
+   path:"/important-notice-petitioners-may-appear-via-vc-without-any-prior-notice/",
+   aliases:["perambalur","veppanthattai","kunnam","principal district court","sessions court","chief judicial magistrate","subordinate court","district munsif","munsif","magistrate","mahila court","family court","sc st court"]},
+
+  {id:36, name:"Tiruchirappalli", bench:"m", slug:"tiruchirappalli",
+   path:"/video-conferencing-link-of-courts/",
+   aliases:["trichy","lalgudi","musiri","thuraiyur","srirangam","manapparai","manachanallur","munsif","sub court","magistrate","family court","commercial court","fast track"]},
+
+  {id:37, name:"Karur", bench:"m", slug:"karur",
+   path:"/hybrid-mode-video-conferencing-link-karur-district-details/",
+   aliases:["kulithalai","krishnarayapuram","aravakurichi","kadavur","munsif","sub court","magistrate"]},
+
+  {id:38, name:"Pudukkottai", bench:"m", slug:"pudukkottai",
+   path:"/hybrid-vc-links-for-courts-in-pudukkottai-district/",
+   aliases:["alangudi","aranthangi","kulathur","thirumayam","illuppur","viralimalai","munsif","sub court","magistrate","family court"]},
+];
+
+// ── STATE ──
+let filt="all", q="", openId=null;
+
+function vcUrl(d){
+  if(d.unconfirmed) return `https://${d.slug}.dcourts.gov.in/`;
+  return `https://${d.slug}.dcourts.gov.in${d.path}`;
+}
+function norm(s){return s.toLowerCase().replace(/[^a-z0-9 ]/g,"")}
+
+// Multi-word AND: every word must appear somewhere in name+aliases combined
+function matchDistrict(d, words){
+  if(!words.length) return {ok:true, hits:[]};
+  const nameNorm = norm(d.name);
+  const aliasText = d.aliases.map(norm).join(" ");
+  const full = nameNorm + " " + aliasText;
+
+  // Every word must appear somewhere in full text
+  const allMatch = words.every(w => full.includes(w));
+  if(!allMatch) return {ok:false, hits:[]};
+
+  // Collect which aliases were hit (for display)
+  const hits = d.aliases.filter(a => words.some(w => norm(a).includes(w)));
+  return {ok:true, hits};
+}
+
+function highlightName(name, words){
+  if(!words.length) return name;
+  let result = name;
+  words.forEach(w => {
+    const re = new RegExp(`(${w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+    result = result.replace(re, '<mark class="hl">$1</mark>');
+  });
+  return result;
+}
+
+function render(){
+  const words = norm(q.trim()).split(/\s+/).filter(Boolean);
+  const container = document.getElementById("dlist");
+  let shown = [];
+
+  D.forEach(d => {
+    if(filt === "p" && d.bench !== "p") return;
+    if(filt === "m" && d.bench !== "m") return;
+    const m = matchDistrict(d, words);
+    if(m.ok) shown.push({d, hits: m.hits});
+  });
+
+  // Label
+  const rl = document.getElementById("rl");
+  if(q.trim()){
+    rl.innerHTML = `SHOWING <span>${shown.length}</span> result${shown.length!==1?"s":""} for "<span>${q.trim()}</span>"`;
+  } else {
+    rl.innerHTML = filt==="all" ? "ALL 38 DISTRICTS"
+      : filt==="p" ? "PRINCIPAL BENCH — 19 DISTRICTS"
+      : "MADURAI BENCH — 19 DISTRICTS";
+  }
+
+  if(!shown.length){
+    container.innerHTML = `<div class="empty"><div class="ico">🔍</div><p>No match for "<strong>${q.trim()}</strong>".<br>Try a place, taluk, or court type.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = shown.map(({d, hits}, i) => {
+    const isOpen = openId === d.id;
+    const dispName = highlightName(d.name, words);
+
+    // Alias chips — show all aliases, highlight matched ones
+    const chips = d.aliases.map(a => {
+      const isHit = words.length && words.some(w => norm(a).includes(w));
+      return `<span class="kchip${isHit?' hl':''}">${a}</span>`;
+    }).join("");
+
+    // Match hint — only when matched via alias not district name
+    const nameMatched = !words.length || words.every(w => norm(d.name).includes(w));
+    const hintHTML = (!nameMatched && hits.length)
+      ? `<div class="kw-match">Matched: <strong>${hits.join(", ")}</strong></div>` : "";
+
+    return `<div class="dc${isOpen?" open":""}" id="c${d.id}" style="animation-delay:${i*.022}s">
+      <div class="dh" onclick="tog(${d.id})">
+        <div class="dn">${String(d.id).padStart(2,"0")}</div>
+        <div class="di">
+          <div class="dname">${dispName}<span class="bb ${d.bench==="p"?"bp":"bm"}">${d.bench==="p"?"Principal":"Madurai"}</span></div>
+          <div class="dsub">${d.slug}.dcourts.gov.in</div>
+        </div>
+        <svg class="chev" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="cp">
+        ${hintHTML}
+        <a class="obtn" href="${vcUrl(d)}" target="_blank" rel="noopener">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open ${d.name} VC Links (Official Site)
+        </a>
+        <div class="known-wrap">
+          <div class="known-title">Searchable keywords</div>
+          <div class="known-chips">${chips}</div>
+        </div>
+        <p class="inote">The official page lists all courts with live VC links updated daily by court staff.</p>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function tog(id){
+  if(openId && openId !== id) document.getElementById("c"+openId)?.classList.remove("open");
+  openId = (openId === id) ? null : id;
+  const el = document.getElementById("c"+id);
+  if(el){
+    el.classList.toggle("open", openId === id);
+    if(openId === id) setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"nearest"}),60);
+  }
+}
+
+const si = document.getElementById("srch"), xbEl = document.getElementById("xb");
+si.addEventListener("input", ()=>{
+  q = si.value;
+  xbEl.classList.toggle("on", q.length > 0);
+  openId = null;
+  render();
+  // auto-open single result
+  const words = norm(q.trim()).split(/\s+/).filter(Boolean);
+  if(words.length){
+    const vis = D.filter(d => {
+      if(filt==="p" && d.bench!=="p") return false;
+      if(filt==="m" && d.bench!=="m") return false;
+      return matchDistrict(d, words).ok;
+    });
+    if(vis.length === 1){ openId = vis[0].id; render(); }
+  }
+});
+function clr(){ si.value=""; q=""; xbEl.classList.remove("on"); openId=null; render(); si.focus(); }
+
+document.querySelectorAll(".ft").forEach(t => t.addEventListener("click", ()=>{
+  document.querySelectorAll(".ft").forEach(x => { x.className="ft"; });
+  filt = t.dataset.f;
+  t.classList.add("ft", filt==="all"?"fa":filt==="p"?"fp":"fm");
+  openId = null; render();
+}));
+
+render();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(r=>console.log('SW registered'))
+      .catch(e=>console.log('SW error',e));
+  });
+}
+</script>
+</body>
+</html>
